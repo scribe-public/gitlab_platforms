@@ -123,9 +123,6 @@ variables:
   ############# DEBUG VARIABLES #############
   MONITOR_MOUNT: /builds
   MONITOR_CLEAN_DOCKER: true
-  # LOG_LEVEL: "INFO"
-  # DEBUG: false
-  # VALINT_LOG_LEVEL: "info"
 
 stages:
   - discovery
@@ -198,6 +195,7 @@ policy-dockerhub:
       - evidence/dockerhub/*sarif*
     expire_in: 1 week
 ```
+
 </details>
 
 <details>
