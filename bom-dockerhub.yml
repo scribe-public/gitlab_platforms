@@ -1,0 +1,83 @@
+spec:
+    inputs:
+      mapping:
+        type: string
+        description: "Image to product mapping"
+        default: ""
+      sign:
+        type: boolean
+        description: "Sign the BOM"
+        default: true
+---
+
+.init_signing_keys: &init_signing_keys
+   - echo "Initiating signing keys"
+   - export ATTEST_KEY=$(echo $ATTEST_KEY_B64 | base64 -d | tr -d '\r' )
+   - export ATTEST_CERT=$(echo $ATTEST_CERT_B64 | base64 -d | tr -d '\r' )
+   - export ATTEST_CA=$(echo $ATTEST_CA_B64 | base64 -d | tr -d '\r' )
+
+.init_verifier_keys: &init_verifier_keys
+   - echo "Initiating verifier keys"
+   - export ATTEST_CA=$(echo $ATTEST_CA_B64 | base64 -d | tr -d '\r' )
+
+.show_versions: &show_versions
+   - echo "Showing versions"
+   - platforms --version
+   - valint --version
+
+.fs-info: &fs-info
+   - echo "Database size"
+   - ls -lh *platforms.db || true
+   - echo "Evidence cache size"
+   - pwd || true
+   - du -sch /builds/scribe-test/platforms_lib || true
+   - echo "Partition size"
+   - df -lh || true
+   - echo "Docker cache size"
+   - docker system df || true
+
+.cleanup-docker-cache: &cleanup-docker-cache
+   - echo "Clean up docker cache"
+   - *fs-info
+   - docker image prune -af
+   - *fs-info
+   - docker system prune -af
+   - *fs-info
+
+.cleanup-evidence-cache: &cleanup-evidence-cache
+   - echo "Clean evidence cache"
+   - rm -rf evidence/* || true
+
+.cleanup-database-cache: &cleanup-evidence-cache
+   - echo "Clean database cache"
+   - rm -rf *platforms.db || true
+
+
+bom-dockerhub:
+  timeout: 5 hours
+  image:
+      name: scribesecurity/platforms:${PLATFORMS_VERSION}
+      entrypoint: [""]
+      pull_policy: always
+  services:
+    - docker:dind
+  before_script:
+      - *show_versions
+      - *init_signing_keys
+      - *cleanup-docker-cache
+  script:      
+      - |
+        if $[[ inputs.sign ]]; then
+          platforms bom \
+            --valint.sign \
+            --allow-failures \
+            dockerhub \
+            --image.mapping \
+            $[[ inputs.mapping ]]
+        else
+          platforms bom \
+            --allow-failures \
+            dockerhub \
+            --image.mapping \
+            $[[ inputs.mapping ]]
+        fi

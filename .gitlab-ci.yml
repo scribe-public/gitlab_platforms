@@ -1,0 +1,223 @@
+variables:
+  ####### PLATFORMS TOOL VERSION #######
+  PLATFORMS_VERSION: "dev-latest376" # Platform APP Version
+  
+  ####### VALINT GLOBAL VARIABLES #######
+  VALINT_SCRIBE_AUTH_CLIENT_SECRET: $SCRIBE_CLIENT_TOKEN # Scribe Service Client Secret
+  VALINT_SCRIBE_ENABLE: true
+  VALINT_SCRIBE_URL: https://api.dev.scribesecurity.com
+  VALINT_CONTEXT_TYPE: "gitlab"
+  VALINT_DISABLE_EVIDENCE_CACHE: false
+
+  ####### SIGNING/VERIFYING GLOBAL VARIABLES #######
+  ATTEST_KEY_B64: $ATTEST_KEY_B64 # Evidence Signing Key
+  ATTEST_CERT_B64: $ATTEST_CERT_B64 # Evidence Signing Cert
+  ATTEST_CA_B64: $ATTEST_CA_B64 # Evidence Signing CA
+
+  ######### DISCOVERY GITLAB VARIABLES #########
+  GITLAB_TOKEN: $GITLAB_PAT_TOKEN # Gitlab discovery token
+
+  ######### DISCOVERY KUBERNETES VARIABLES #########
+  K8S_TOKEN: $K8S_TEST_CLUSTER_TOKEN # K8s discovery token
+  K8S_URL: https://56E073BB3D6C84F4E42CEF28C0AEA1CE.sk1.us-west-2.eks.amazonaws.com # K8s discovery URL
+  
+  ######### DISCOVERY DOCKERHUB VARIABLES #########
+  DOCKERHUB_USERNAME: $DOCKERHUB_USERNAME
+  DOCKERHUB_PASSWORD: $DOCKERHUB_PASSWORD_B64
+
+
+  ######### DIND VARIABLES #########
+  DOCKER_DRIVER: overlay2
+  DOCKER_TLS_VERIFY: 1
+  DOCKER_TLS_CERTDIR: "/certs"
+  DOCKER_CERT_PATH: "/certs/client"
+  DOCKER_HOST: tcp://docker:2376
+
+  ############# DEBUG VARIABLES #############
+  MONITOR_MOUNT: /builds
+  MONITOR_CLEAN_DOCKER: true
+  # LOG_LEVEL: "INFO"
+  # DEBUG: false
+  # VALINT_LOG_LEVEL: "info"
+
+stages:
+  - discovery
+  - bom-sign
+  - policy
+
+############### REUSABLE DISCOVERY ################
+include:
+  # DISCOVERY
+  - local: gitlab-ci.d/discover-gitlab.yml
+    inputs:
+      project-mapping: "flask-monorepo-project::Flask::V.2 dhs-vue-sample-proj::dhs-vue-sample-proj::V.2"
+      organization-mapping: "*::Flask::V.2 *::dhs-vue-sample-proj::V.2"
+      gitlab-token: ${GITLAB_TOKEN}
+
+  - local: gitlab-ci.d/discover-dockerhub.yml
+    inputs:
+      mapping: "*service-*::Flask::V.2 *dhs*::dhs-vue-sample-proj::V.2"
+      username: ${DOCKERHUB_USERNAME}
+      password-b64: ${DOCKERHUB_PASSWORD_B64}
+
+  - local: gitlab-ci.d/discover-k8s.yml
+    inputs:
+      namespace-mapping: "*default*::factory2::V.2"
+      pod-mapping: "*::factory2::V.2"
+      token: ${K8S_URL}
+      url: ${K8S_TOKEN}
+
+  # BOM
+  - local: gitlab-ci.d/bom-dockerhub.yml
+    inputs:
+      mapping: "*service-*::Flask::V.2 *dhs*::dhs-vue-sample-proj::V.2"
+
+  - local: gitlab-ci.d/bom-k8s.yml
+    inputs:
+      mapping: "*default*::*::*::factory2::V.2"
+
+  # POLICY
+  - local: gitlab-ci.d/policy-gitlab.yml
+    inputs:
+      project-mapping: "flask-monorepo-project::Flask::V.2 dhs-vue-sample-proj::dhs-vue-sample-proj::V.2"
+      organization-mapping: "*::Flask::V.2 *::dhs-vue-sample-proj::V.2"
+
+  - local: gitlab-ci.d/policy-dockerhub.yml
+    inputs:
+      mapping: "*service-*::Flask::V.2 *dhs*::dhs-vue-sample-proj::V.2"
+
+  - local: gitlab-ci.d/policy-k8s.yml
+    inputs:
+      mapping: "*default*::*::*::factory2::V.2"
+
+discovery-gitlab:
+  stage: discovery
+  cache:
+  - key: gitlab.platforms.db
+    paths:
+    - gitlab.platforms.db
+  - key: discovery-gitlab-product-version
+    paths:
+    - discovery-gitlab-product-version
+  - key: evidence-gitlab
+    paths:
+    - evidence/gitlab
+  variables:
+    PLATFORMS_DB_PATH: gitlab.platforms.db
+    VALINT_OUTPUT_DIRECTORY: evidence/gitlab
+
+
+discovery-dockerhub:
+  stage: discovery
+  cache:
+  - key: dockerhub.platforms.db
+    paths:
+    - dockerhub.platforms.db
+  - key: evidence-dockerhub-discovery
+    paths:
+    - evidence/dockerhub-discovery
+  variables:
+    PLATFORMS_DB_PATH: dockerhub.platforms.db
+    VALINT_OUTPUT_DIRECTORY: evidence/dockerhub-discovery
+
+discovery-k8s:
+  stage: discovery
+  cache:
+  - key: k8s.platforms.db
+    paths:
+    - k8s.platforms.db
+  - key: evidence-k8s-discovery
+    paths:
+    - evidence/k8s-discovery
+  variables:
+    PLATFORMS_DB_PATH: k8s.platforms.db
+    VALINT_OUTPUT_DIRECTORY: evidence/k8s-discovery
+
+############### BOM ################
+bom-dockerhub:
+  stage: bom-sign
+  needs: ["discovery-dockerhub"]
+  timeout: 5 hours
+  cache:
+  - key: dockerhub.platforms.db
+    paths:
+    - dockerhub.platforms.db
+  - key: evidence-dockerhub
+    paths:
+    - evidence/dockerhub
+  variables:
+    PLATFORMS_DB_PATH: dockerhub.platforms.db
+    VALINT_OUTPUT_DIRECTORY: evidence/dockerhub
+
+bom-k8s:
+  stage: bom-sign
+  needs: ["discovery-k8s"]
+  cache:
+  - key: k8s.platforms.db
+    paths:
+    - k8s.platforms.db
+  - key: evidence-k8s
+    paths:
+    - evidence/k8s
+  variables:
+    PLATFORMS_DB_PATH: k8s.platforms.db
+    VALINT_OUTPUT_DIRECTORY: evidence/k8s
+
+############### POLICY ################
+policy-gitlab:
+  stage: policy
+  needs: ["discovery-gitlab"]
+  cache:
+  - key: gitlab.platforms.db
+    paths:
+    - gitlab.platforms.db
+  - key: discovery-gitlab-product-version
+    paths:
+    - discovery-gitlab-product-version
+  - key: evidence-gitlab
+    paths:
+    - evidence/gitlab
+  variables:
+    PLATFORMS_DB_PATH: gitlab.platforms.db
+    VALINT_OUTPUT_DIRECTORY: evidence/gitlab
+  artifacts:
+    paths:
+      - evidence/gitlab/*sarif*
+    expire_in: 1 week
+
+policy-dockerhub:
+  stage: policy
+  needs: ["bom-dockerhub"]
+  timeout: 5 hours
+  cache:
+  - key: dockerhub.platforms.db
+    paths:
+      - dockerhub.platforms.db
+  - key: evidence-dockerhub
+    paths:
+    - evidence/dockerhub
+  variables:
+    PLATFORMS_DB_PATH: dockerhub.platforms.db
+    VALINT_OUTPUT_DIRECTORY: evidence/dockerhub
+  artifacts:
+    paths:
+      - evidence/dockerhub/*sarif*
+    expire_in: 1 week
+
+policy-k8s:
+  stage: policy
+  needs: ["bom-k8s"]
+  cache:
+  - key: k8s.platforms.db
+    paths:
+      - k8s.platforms.db
+  - key: evidence-k8s
+    paths:
+    - evidence/k8s
+  variables:
+    PLATFORMS_DB_PATH: k8s.platforms.db
+    VALINT_OUTPUT_DIRECTORY: evidence/k8s
+  artifacts:
+    paths:
+      - evidence/k8s/*sarif*
+    expire_in: 1 week

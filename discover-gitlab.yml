@@ -1,0 +1,120 @@
+
+spec:
+   inputs:
+      project-mapping:
+         type: string
+         description: "Project mapping"
+         default: ""
+      organization-mapping:
+         type: string
+         description: "Organization mapping"
+         default: ""
+      gitlab-token:
+         type: string
+         description: "Gitlab token"
+      sign:
+         type: boolean
+         description: "Sign the evidence"
+         default: true
+---
+
+
+.init_signing_keys: &init_signing_keys
+   - echo "Initiating signing keys"
+   - export ATTEST_KEY=$(echo $ATTEST_KEY_B64 | base64 -d | tr -d '\r' )
+   - export ATTEST_CERT=$(echo $ATTEST_CERT_B64 | base64 -d | tr -d '\r' )
+   - export ATTEST_CA=$(echo $ATTEST_CA_B64 | base64 -d | tr -d '\r' )
+
+.init_verifier_keys: &init_verifier_keys
+   - echo "Initiating verifier keys"
+   - export ATTEST_CA=$(echo $ATTEST_CA_B64 | base64 -d | tr -d '\r' )
+
+.show_versions: &show_versions
+   - echo "Showing versions"
+   - platforms --version
+   - valint --version
+
+.fs-info: &fs-info
+   - echo "Database size"
+   - ls -lh *platforms.db || true
+   - echo "Evidence cache size"
+   - pwd || true
+   - du -sch /builds/scribe-test/platforms_lib || true
+   - echo "Partition size"
+   - df -lh || true
+   - echo "Docker cache size"
+   - docker system df || true
+
+.cleanup-docker-cache: &cleanup-docker-cache
+   - echo "Clean up docker cache"
+   - *fs-info
+   - docker image prune -af
+   - *fs-info
+   - docker system prune -af
+   - *fs-info
+
+.cleanup-evidence-cache: &cleanup-evidence-cache
+   - echo "Clean evidence cache"
+   - rm -rf evidence/* || true
+
+.cleanup-database-cache: &cleanup-evidence-cache
+   - echo "Clean database cache"
+   - rm -rf *platforms.db || true
+
+.hack: &hack
+   # Hack upload some evidence to create product version
+   - valint bom busybox:latest --product-key Flask --product-version V.2 --context-type $VALINT_CONTEXT_TYPE
+   - valint bom busybox:latest --product-key factory2 --product-version V.2 --context-type $VALINT_CONTEXT_TYPE
+   - valint bom busybox:latest --product-key dhs-vue-sample-proj --product-version V.2 --context-type $VALINT_CONTEXT_TYPE
+
+discovery-gitlab:
+
+   image:
+      name: scribesecurity/platforms:${PLATFORMS_VERSION}
+      entrypoint: [""]
+      pull_policy: always
+   variables:
+      PROJECT_MAPPING: "flask-monorepo-project::Flask::V.2 dhs-vue-sample-proj::dhs-vue-sample-proj::V.2"
+   cache:
+   - key: gitlab.platforms.db
+     paths:
+     - gitlab.platforms.db
+   - key: discovery-gitlab-product-version
+     paths:
+     - discovery-gitlab-product-version
+   - key: evidence-gitlab
+     paths:
+     - evidence/gitlab
+   before_script:
+      - *show_versions
+      - *init_signing_keys
+      - echo "gitlab.$CI_JOB_ID" > discovery-gitlab-product-version
+      - export PLATFORMS_DB_PATH=gitlab.platforms.db
+      - export VALINT_OUTPUT_DIRECTORY=evidence/gitlab
+      - export VALINT_SCRIBE_ENABLE=true
+   script:
+      - *hack
+
+      # Discover gitlab
+      - |
+         platforms discover gitlab \
+            --token $[[ inputs.gitlab-token ]]
+
+      # Push Evidence
+      - |
+         if $[[ inputs.sign ]]; then
+            platforms evidence \
+               --valint.sign \
+               gitlab \
+               --organization.mapping \
+               $[[ inputs.organization-mapping ]] \
+               --project.mapping \
+               $[[ inputs.project-mapping ]]
+         else
+            platforms evidence \
+               gitlab \
+               --organization.mapping \
+               $[[ inputs.organization-mapping ]] \
+               --project.mapping \
+               $[[ inputs.project-mapping ]]
+         fi
