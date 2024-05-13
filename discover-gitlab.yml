@@ -93,8 +93,6 @@ discovery-gitlab:
       - export VALINT_OUTPUT_DIRECTORY=evidence/gitlab
       - export VALINT_SCRIBE_ENABLE=true
    script:
-      - *hack
-
       # Discover gitlab
       - |
          platforms discover gitlab \
