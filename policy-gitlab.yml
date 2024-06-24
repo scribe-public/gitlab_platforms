@@ -70,7 +70,6 @@ policy-gitlab:
    script: 
       - |
          platforms verify \
-            --valint.git-branch discovery \
             --valint.sign \
             gitlab \
             --organization.mapping \

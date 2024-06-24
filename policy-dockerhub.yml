@@ -69,14 +69,12 @@ policy-dockerhub:
       - |
         if $[[ inputs.sign ]]; then
           platforms verify \
-            --valint.git-branch discovery \
             --valint.sign \
             dockerhub \
             --image.mapping \
             $[[ inputs.image-mapping ]]
         else
           platforms verify \
-            --valint.git-branch discovery \
             dockerhub \
             --image.mapping \
             $[[ inputs.image-mapping ]]
