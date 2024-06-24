@@ -73,7 +73,7 @@ policy-dockerhub:
             --valint.sign \
             dockerhub \
             --image.mapping \
-            $[[ inputs.mapping ]]
+            $[[ inputs.image-mapping ]]
         else
           platforms verify \
             --valint.git-branch discovery \
