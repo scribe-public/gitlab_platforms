@@ -1,6 +1,10 @@
 spec:
   inputs:
-    mapping:
+    namespace-mapping:
+      type: string
+      description: "Namespaces to product mapping"
+      default: ""
+    repository-mapping:
       type: string
       description: "Image repository to product mapping"
       default: ""
@@ -80,11 +84,15 @@ discovery-dockerhub:
         platforms evidence \
           --valint.sign \
           dockerhub \
+          --namespace.mapping \
+            $[[ inputs.namespace-mapping ]] \
           --repository.mapping \
-            $[[ inputs.mapping ]]
+            $[[ inputs.repository-mapping ]]
       else
         platforms evidence \
           dockerhub \
+          --namespace.mapping \
+            $[[ inputs.namespace-mapping ]] \
           --repository.mapping \
-            $[[ inputs.mapping ]]
+            $[[ inputs.repository-mapping ]]
       fi

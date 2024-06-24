@@ -1,6 +1,6 @@
 spec:
     inputs:
-      mapping:
+      image-mapping:
         type: string
         description: "Image to product mapping"
         default: ""
@@ -79,5 +79,5 @@ policy-dockerhub:
             --valint.git-branch discovery \
             dockerhub \
             --image.mapping \
-            $[[ inputs.mapping ]]
+            $[[ inputs.image-mapping ]]
         fi
