@@ -74,6 +74,7 @@ policy-k8s:
           --valint.sign \
           --allow-failures \
           k8s \
+          --ignore-state \
           --image.mapping \
           $[[ inputs.image-mapping ]]
       else
@@ -81,6 +82,7 @@ policy-k8s:
           --valint.git-branch discovery \
           --allow-failures \
           k8s \
+          --ignore-state \
           --image.mapping \
           $[[ inputs.image-mapping ]]
       fi
