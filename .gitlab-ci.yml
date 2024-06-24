@@ -51,20 +51,20 @@ stages:
 ############### REUSABLE DISCOVERY ################
 include:
   # DISCOVERY
-  - local: gitlab-ci.d/discover-gitlab.yml
+  - local: discover-gitlab.yml
     inputs:
       project-mapping: "*flask-monorepo-project::flask-monorepo-project::${SCRIBE_PRODUCT_VERSION} *dhs-vue-sample-proj::dhs-vue-sample-proj::${SCRIBE_PRODUCT_VERSION}"
       organization-mapping: "*::flask-monorepo-project::${SCRIBE_PRODUCT_VERSION} *::dhs-vue-sample-proj::${SCRIBE_PRODUCT_VERSION}"
       gitlab-token: ${GITLAB_TOKEN}
 
-  - local: gitlab-ci.d/discover-dockerhub.yml
+  - local: discover-dockerhub.yml
     inputs:
       namespace-mapping: "*::flask-monorepo-project::${SCRIBE_PRODUCT_VERSION} *::dhs-vue-sample-proj::${SCRIBE_PRODUCT_VERSION}"
       repository-mapping: "*service-*::flask-monorepo-project::${SCRIBE_PRODUCT_VERSION} *dhs*::dhs-vue-sample-proj::${SCRIBE_PRODUCT_VERSION}"
       username: ${DOCKERHUB_USERNAME}
       password-b64: ${DOCKERHUB_PASSWORD_B64}
 
-  - local: gitlab-ci.d/discover-k8s.yml
+  - local: discover-k8s.yml
     inputs:
       namespace-mapping: "default::flask-monorepo-project::${SCRIBE_PRODUCT_VERSION} default::dhs-vue-sample-proj::${SCRIBE_PRODUCT_VERSION}"
       pod-mapping: "*service-*::flask-monorepo-project::${SCRIBE_PRODUCT_VERSION} *dhs*::dhs-vue-sample-proj::${SCRIBE_PRODUCT_VERSION}"
@@ -72,25 +72,25 @@ include:
       url: ${K8S_TOKEN}
 
   # BOM
-  - local: gitlab-ci.d/bom-dockerhub.yml
+  - local: bom-dockerhub.yml
     inputs:
       mapping: "*service-*::flask-monorepo-project::${SCRIBE_PRODUCT_VERSION} *dhs*::dhs-vue-sample-proj::${SCRIBE_PRODUCT_VERSION}"
 
-  - local: gitlab-ci.d/bom-k8s.yml
+  - local: bom-k8s.yml
     inputs:
       mapping: "default::*service-*::*service-*::flask-monorepo-project::${SCRIBE_PRODUCT_VERSION}"
 
   # POLICY
-  - local: gitlab-ci.d/policy-gitlab.yml
+  - local: policy-gitlab.yml
     inputs:
       project-mapping: "*flask-monorepo-project::flask-monorepo-project::${SCRIBE_PRODUCT_VERSION} *dhs-vue-sample-proj::dhs-vue-sample-proj::${SCRIBE_PRODUCT_VERSION}"
       organization-mapping: "*::flask-monorepo-project::${SCRIBE_PRODUCT_VERSION} *::dhs-vue-sample-proj::${SCRIBE_PRODUCT_VERSION}"
 
-  - local: gitlab-ci.d/policy-dockerhub.yml
+  - local: policy-dockerhub.yml
     inputs:
       image-mapping: "*service-*::flask-monorepo-project::${SCRIBE_PRODUCT_VERSION} *dhs*::dhs-vue-sample-proj::${SCRIBE_PRODUCT_VERSION}"
 
-  - local: gitlab-ci.d/policy-k8s.yml
+  - local: policy-k8s.yml
     inputs:
       image-mapping: "default::*service-*::*service-*::flask-monorepo-project::${SCRIBE_PRODUCT_VERSION}"
 
