@@ -39,15 +39,15 @@ include:
   # DISCOVERY
   - local: discover-gitlab.yml
     inputs:
-      project-mapping: "flask-monorepo-project::Flask::V.2 dhs-vue-sample-proj::dhs-vue-sample-proj::V.2"
-      organization-mapping: "*::Flask::V.2 *::dhs-vue-sample-proj::V.2"
+      project-mapping: "flask-monorepo-project::flask-monorepo-project`::V.2 dhs-vue-sample-proj::dhs-vue-sample-proj::V.2"
+      organization-mapping: "*::flask-monorepo-project`::V.2 *::dhs-vue-sample-proj::V.2"
       gitlab-token: ${GITLAB_TOKEN}
 
   # POLICY
   - local: policy-gitlab.yml
     inputs:
-      project-mapping: "flask-monorepo-project::Flask::V.2 dhs-vue-sample-proj::dhs-vue-sample-proj::V.2"
-      organization-mapping: "*::Flask::V.2 *::dhs-vue-sample-proj::V.2"
+      project-mapping: "flask-monorepo-project::flask-monorepo-project`::V.2 dhs-vue-sample-proj::dhs-vue-sample-proj::V.2"
+      organization-mapping: "*::flask-monorepo-project`::V.2 *::dhs-vue-sample-proj::V.2"
 
 discovery-gitlab:
   stage: discovery
@@ -133,19 +133,19 @@ include:
   # DISCOVERY
   - local: discover-dockerhub.yml
     inputs:
-      mapping: "*service-*::Flask::V.2 *dhs*::dhs-vue-sample-proj::V.2"
+      mapping: "*service-*::flask-monorepo-project`::V.2 *dhs*::dhs-vue-sample-proj::V.2"
       username: ${DOCKERHUB_USERNAME}
       password-b64: ${DOCKERHUB_PASSWORD_B64}
 
   # BOM
   - local: bom-dockerhub.yml
     inputs:
-      mapping: "*service-*::Flask::V.2 *dhs*::dhs-vue-sample-proj::V.2"
+      mapping: "*service-*::flask-monorepo-project`::V.2 *dhs*::dhs-vue-sample-proj::V.2"
 
   # POLICY
   - local: policy-dockerhub.yml
     inputs:
-      mapping: "*service-*::Flask::V.2 *dhs*::dhs-vue-sample-proj::V.2"
+      mapping: "*service-*::flask-monorepo-project`::V.2 *dhs*::dhs-vue-sample-proj::V.2"
 
 discovery-dockerhub:
   stage: discovery
@@ -242,13 +242,13 @@ include:
   # DISCOVERY
   - local: discover-gitlab.yml
     inputs:
-      project-mapping: "flask-monorepo-project::Flask::V.2 dhs-vue-sample-proj::dhs-vue-sample-proj::V.2"
-      organization-mapping: "*::Flask::V.2 *::dhs-vue-sample-proj::V.2"
+      project-mapping: "flask-monorepo-project::flask-monorepo-project`::V.2 dhs-vue-sample-proj::dhs-vue-sample-proj::V.2"
+      organization-mapping: "*::flask-monorepo-project`::V.2 *::dhs-vue-sample-proj::V.2"
       gitlab-token: ${GITLAB_TOKEN}
 
   - local: discover-dockerhub.yml
     inputs:
-      mapping: "*service-*::Flask::V.2 *dhs*::dhs-vue-sample-proj::V.2"
+      mapping: "*service-*::flask-monorepo-project`::V.2 *dhs*::dhs-vue-sample-proj::V.2"
       username: ${DOCKERHUB_USERNAME}
       password-b64: ${DOCKERHUB_PASSWORD_B64}
 
@@ -262,7 +262,7 @@ include:
   # BOM
   - local: bom-dockerhub.yml
     inputs:
-      mapping: "*service-*::Flask::V.2 *dhs*::dhs-vue-sample-proj::V.2"
+      mapping: "*service-*::flask-monorepo-project`::V.2 *dhs*::dhs-vue-sample-proj::V.2"
 
   - local: bom-k8s.yml
     inputs:
@@ -271,12 +271,12 @@ include:
   # POLICY
   - local: policy-gitlab.yml
     inputs:
-      project-mapping: "flask-monorepo-project::Flask::V.2 dhs-vue-sample-proj::dhs-vue-sample-proj::V.2"
-      organization-mapping: "*::Flask::V.2 *::dhs-vue-sample-proj::V.2"
+      project-mapping: "flask-monorepo-project::flask-monorepo-project`::V.2 dhs-vue-sample-proj::dhs-vue-sample-proj::V.2"
+      organization-mapping: "*::flask-monorepo-project`::V.2 *::dhs-vue-sample-proj::V.2"
 
   - local: policy-dockerhub.yml
     inputs:
-      mapping: "*service-*::Flask::V.2 *dhs*::dhs-vue-sample-proj::V.2"
+      mapping: "*service-*::flask-monorepo-project`::V.2 *dhs*::dhs-vue-sample-proj::V.2"
 
   - local: policy-k8s.yml
     inputs:
