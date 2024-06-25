@@ -67,7 +67,6 @@ bom-k8s:
       - *cleanup-docker-cache
   script:
     - |
-      set -x
       if $[[ inputs.sign ]]; then
         platforms bom \
           --valint.sign \
@@ -84,4 +83,3 @@ bom-k8s:
           --image.mapping \
             $[[ inputs.mapping]]
       fi
-      set +x
