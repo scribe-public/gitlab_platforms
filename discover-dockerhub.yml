@@ -1,7 +1,7 @@
 spec:
   inputs:
     scope-days:
-      type: integer
+      type: number
       description: "Number of days to scope"
       default: 30
     namespace-mapping:
