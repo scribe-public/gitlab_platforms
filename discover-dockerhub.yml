@@ -1,5 +1,9 @@
 spec:
   inputs:
+    scope-days:
+      type: integer
+      description: "Number of days to scope"
+      default: 30
     namespace-mapping:
       type: string
       description: "Namespaces to product mapping"
@@ -77,7 +81,8 @@ discovery-dockerhub:
     - |
       platforms discover dockerhub \
         --username $[[ inputs.username ]] \
-        --password $DOCKERHUB_PASSWORD
+        --password $DOCKERHUB_PASSWORD \
+        --scope.past_days $[[ inputs.scope-days ]]
 
     - |
       if $[[ inputs.sign ]]; then

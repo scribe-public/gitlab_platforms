@@ -19,6 +19,8 @@ variables:
 
   ######### DISCOVERY GITLAB VARIABLES #########
   GITLAB_TOKEN: $GITLAB_PAT_TOKEN # Gitlab discovery token
+  GITLAB_COMMIT_TIME_SCOPE: 90
+  GITLAB_PIPELINE_TIME_SCOPE: 90
 
   ######### DISCOVERY KUBERNETES VARIABLES #########
   K8S_TOKEN: $K8S_TEST_CLUSTER_TOKEN # K8s discovery token
@@ -27,6 +29,7 @@ variables:
   ######### DISCOVERY DOCKERHUB VARIABLES #########
   DOCKERHUB_USERNAME: $DOCKERHUB_USERNAME
   DOCKERHUB_PASSWORD: $DOCKERHUB_PASSWORD_B64
+  DOCKERHUB_TIME_SCOPE: 90
 
 
   ######### DIND VARIABLES #########
@@ -56,6 +59,8 @@ include:
       project-mapping: "*flask-monorepo-project::flask-monorepo-project::${SCRIBE_PRODUCT_VERSION} *dhs-vue-sample-proj::dhs-vue-sample-proj::${SCRIBE_PRODUCT_VERSION}"
       organization-mapping: "*::flask-monorepo-project::${SCRIBE_PRODUCT_VERSION} *::dhs-vue-sample-proj::${SCRIBE_PRODUCT_VERSION}"
       gitlab-token: ${GITLAB_TOKEN}
+      scope-commit-days: ${GITLAB_COMMIT_TIME_SCOPE}
+      scope-pipeline-days: ${GITLAB_PIPELINE_TIME_SCOPE}
 
   - local: discover-dockerhub.yml
     inputs:
@@ -63,6 +68,7 @@ include:
       repository-mapping: "*service-*::flask-monorepo-project::${SCRIBE_PRODUCT_VERSION} *dhs*::dhs-vue-sample-proj::${SCRIBE_PRODUCT_VERSION}"
       username: ${DOCKERHUB_USERNAME}
       password-b64: ${DOCKERHUB_PASSWORD_B64}
+      scope-days: ${DOCKERHUB_TIME_SCOPE}
 
   - local: discover-k8s.yml
     inputs:

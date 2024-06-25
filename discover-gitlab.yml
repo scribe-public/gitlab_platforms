@@ -1,6 +1,14 @@
 
 spec:
    inputs:
+      scope-commit-days:
+         type: integer
+         description: "Number of days to scope"
+         default: 30
+      scope-pipeline-days:
+         type: integer
+         description: "Number of days to scope"
+         default: 30
       project-mapping:
          type: string
          description: "Project mapping"
@@ -96,7 +104,9 @@ discovery-gitlab:
       # Discover gitlab
       - |
          platforms discover gitlab \
-            --token $[[ inputs.gitlab-token ]]
+            --token $[[ inputs.gitlab-token ]] \
+            --scope.commit.past_days $[[ inputs.scope-commit-days ]] \
+            --scope.pipeline.past_days $[[ inputs.scope-pipeline-days ]]
 
       # Push Evidence
       - |
