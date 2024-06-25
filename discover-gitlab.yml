@@ -2,13 +2,13 @@
 spec:
    inputs:
       scope-commit-days:
-         type: number
+         type: string
          description: "Number of days to scope"
-         default: 30
+         default: "30"
       scope-pipeline-days:
-         type: number
+         type: string
          description: "Number of days to scope"
-         default: 30
+         default: "30"
       project-mapping:
          type: string
          description: "Project mapping"
