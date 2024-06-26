@@ -71,6 +71,7 @@ policy-k8s:
       if $[[ inputs.sign ]]; then
         platforms verify \
           --valint.sign \
+          --valint.git-branch dev \
           --allow-failures \
           k8s \
           --ignore-state \
@@ -78,6 +79,7 @@ policy-k8s:
           $[[ inputs.image-mapping ]]
       else
         platforms verify \
+          --valint.git-branch dev \
           --allow-failures \
           k8s \
           --ignore-state \
