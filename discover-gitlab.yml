@@ -1,6 +1,14 @@
 
 spec:
    inputs:
+      scope-commit-days:
+         type: string
+         description: "Number of days to scope"
+         default: "30"
+      scope-pipeline-days:
+         type: string
+         description: "Number of days to scope"
+         default: "30"
       project-mapping:
          type: string
          description: "Project mapping"
@@ -63,7 +71,7 @@ spec:
 
 .hack: &hack
    # Hack upload some evidence to create product version
-   - valint bom busybox:latest --product-key Flask --product-version V.2 --context-type $VALINT_CONTEXT_TYPE
+   - valint bom busybox:latest --product-key flask-monorepo-project` --product-version V.2 --context-type $VALINT_CONTEXT_TYPE
    - valint bom busybox:latest --product-key factory2 --product-version V.2 --context-type $VALINT_CONTEXT_TYPE
    - valint bom busybox:latest --product-key dhs-vue-sample-proj --product-version V.2 --context-type $VALINT_CONTEXT_TYPE
 
@@ -74,7 +82,7 @@ discovery-gitlab:
       entrypoint: [""]
       pull_policy: always
    variables:
-      PROJECT_MAPPING: "flask-monorepo-project::Flask::V.2 dhs-vue-sample-proj::dhs-vue-sample-proj::V.2"
+      PROJECT_MAPPING: "flask-monorepo-project::flask-monorepo-project`::V.2 dhs-vue-sample-proj::dhs-vue-sample-proj::V.2"
    cache:
    - key: gitlab.platforms.db
      paths:
@@ -96,7 +104,9 @@ discovery-gitlab:
       # Discover gitlab
       - |
          platforms discover gitlab \
-            --token $[[ inputs.gitlab-token ]]
+            --token $[[ inputs.gitlab-token ]] \
+            --scope.commit.past_days $[[ inputs.scope-commit-days ]] \
+            --scope.pipeline.past_days $[[ inputs.scope-pipeline-days ]]
 
       # Push Evidence
       - |
