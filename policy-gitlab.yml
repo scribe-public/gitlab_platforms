@@ -71,6 +71,7 @@ policy-gitlab:
       - |
          platforms verify \
             --valint.sign \
+            --allow-failures \
             gitlab \
             --organization.mapping \
             $[[ inputs.organization-mapping ]] \

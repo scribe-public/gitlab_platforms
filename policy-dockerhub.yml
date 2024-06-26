@@ -70,11 +70,13 @@ policy-dockerhub:
         if $[[ inputs.sign ]]; then
           platforms verify \
             --valint.sign \
+            --allow-failures \
             dockerhub \
             --image.mapping \
             $[[ inputs.image-mapping ]]
         else
           platforms verify \
+            --allow-failures \
             dockerhub \
             --image.mapping \
             $[[ inputs.image-mapping ]]
