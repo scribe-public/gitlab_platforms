@@ -3,7 +3,7 @@ variables:
   PLATFORMS_VERSION: "latest" # Platform APP Version
 
   ####### SCRIBE PRODUCT VERSION #######
-  SCRIBE_PRODUCT_VERSION: "v1.6"
+  SCRIBE_PRODUCT_VERSION: "v1.7"
   
   ####### VALINT GLOBAL VARIABLES #######
   VALINT_SCRIBE_AUTH_CLIENT_SECRET: $SCRIBE_CLIENT_TOKEN # Scribe Service Client Secret

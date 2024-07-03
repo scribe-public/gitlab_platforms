@@ -71,7 +71,6 @@ policy-gitlab:
       - |
          platforms verify \
             --valint.sign \
-            --valint.git-branch dev \
             --allow-failures \
             gitlab \
             --organization.mapping \
