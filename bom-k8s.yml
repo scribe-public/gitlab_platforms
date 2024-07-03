@@ -72,12 +72,14 @@ bom-k8s:
           --valint.sign \
           --allow-failures \
           k8s \
+          --ignore-state \
           --image.mapping \
             $[[ inputs.mapping]]
       else
         platforms bom \
           --allow-failures \
           k8s \
+          --ignore-state \
           --image.mapping \
             $[[ inputs.mapping]]
       fi

@@ -70,8 +70,8 @@ policy-gitlab:
    script: 
       - |
          platforms verify \
-            --valint.git-branch discovery \
             --valint.sign \
+            --allow-failures \
             gitlab \
             --organization.mapping \
             $[[ inputs.organization-mapping ]] \

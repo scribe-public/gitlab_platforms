@@ -1,8 +1,8 @@
 spec:
   inputs:
-    mapping:
+    image-mapping:
         type: string
-        description: "Namespace mapping"
+        description: "Image mapping"
         default: ""
     sign:
       type: boolean
@@ -70,17 +70,17 @@ policy-k8s:
     - |
       if $[[ inputs.sign ]]; then
         platforms verify \
-          --valint.git-branch discovery \
           --valint.sign \
           --allow-failures \
           k8s \
+          --ignore-state \
           --image.mapping \
-          $[[ inputs.mapping ]]
+          $[[ inputs.image-mapping ]]
       else
         platforms verify \
-          --valint.git-branch discovery \
           --allow-failures \
           k8s \
+          --ignore-state \
           --image.mapping \
-          $[[ inputs.mapping ]]
+          $[[ inputs.image-mapping ]]
       fi

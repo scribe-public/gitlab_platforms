@@ -1,11 +1,14 @@
 variables:
   ####### PLATFORMS TOOL VERSION #######
-  PLATFORMS_VERSION: "dev-latest376" # Platform APP Version
+  PLATFORMS_VERSION: "latest" # Platform APP Version
+
+  ####### SCRIBE PRODUCT VERSION #######
+  SCRIBE_PRODUCT_VERSION: "v1.7"
   
   ####### VALINT GLOBAL VARIABLES #######
   VALINT_SCRIBE_AUTH_CLIENT_SECRET: $SCRIBE_CLIENT_TOKEN # Scribe Service Client Secret
   VALINT_SCRIBE_ENABLE: true
-  VALINT_SCRIBE_URL: https://api.dev.scribesecurity.com
+  VALINT_SCRIBE_URL: https://api.scribesecurity.com
   VALINT_CONTEXT_TYPE: "gitlab"
   VALINT_DISABLE_EVIDENCE_CACHE: false
 
@@ -16,14 +19,17 @@ variables:
 
   ######### DISCOVERY GITLAB VARIABLES #########
   GITLAB_TOKEN: $GITLAB_PAT_TOKEN # Gitlab discovery token
+  GITLAB_COMMIT_TIME_SCOPE: 90
+  GITLAB_PIPELINE_TIME_SCOPE: 90
 
   ######### DISCOVERY KUBERNETES VARIABLES #########
   K8S_TOKEN: $K8S_TEST_CLUSTER_TOKEN # K8s discovery token
-  K8S_URL: https://56E073BB3D6C84F4E42CEF28C0AEA1CE.sk1.us-west-2.eks.amazonaws.com # K8s discovery URL
+  K8S_URL: $K8S_URL # K8s discovery URL
   
   ######### DISCOVERY DOCKERHUB VARIABLES #########
   DOCKERHUB_USERNAME: $DOCKERHUB_USERNAME
   DOCKERHUB_PASSWORD: $DOCKERHUB_PASSWORD_B64
+  DOCKERHUB_TIME_SCOPE: 90
 
 
   ######### DIND VARIABLES #########
@@ -48,47 +54,51 @@ stages:
 ############### REUSABLE DISCOVERY ################
 include:
   # DISCOVERY
-  - local: gitlab-ci.d/discover-gitlab.yml
+  - local: discover-gitlab.yml
     inputs:
-      project-mapping: "flask-monorepo-project::Flask::V.2 dhs-vue-sample-proj::dhs-vue-sample-proj::V.2"
-      organization-mapping: "*::Flask::V.2 *::dhs-vue-sample-proj::V.2"
+      project-mapping: "*flask-monorepo-project::flask-monorepo-project::${SCRIBE_PRODUCT_VERSION} *dhs-vue-sample-proj::dhs-vue-sample-proj::${SCRIBE_PRODUCT_VERSION}"
+      organization-mapping: "*::flask-monorepo-project::${SCRIBE_PRODUCT_VERSION} *::dhs-vue-sample-proj::${SCRIBE_PRODUCT_VERSION}"
       gitlab-token: ${GITLAB_TOKEN}
+      scope-commit-days: ${GITLAB_COMMIT_TIME_SCOPE}
+      scope-pipeline-days: ${GITLAB_PIPELINE_TIME_SCOPE}
 
-  - local: gitlab-ci.d/discover-dockerhub.yml
+  - local: discover-dockerhub.yml
     inputs:
-      mapping: "*service-*::Flask::V.2 *dhs*::dhs-vue-sample-proj::V.2"
+      namespace-mapping: "*::flask-monorepo-project::${SCRIBE_PRODUCT_VERSION} *::dhs-vue-sample-proj::${SCRIBE_PRODUCT_VERSION}"
+      repository-mapping: "*service-*::flask-monorepo-project::${SCRIBE_PRODUCT_VERSION} *dhs*::dhs-vue-sample-proj::${SCRIBE_PRODUCT_VERSION}"
       username: ${DOCKERHUB_USERNAME}
       password-b64: ${DOCKERHUB_PASSWORD_B64}
+      scope-days: ${DOCKERHUB_TIME_SCOPE}
 
-  - local: gitlab-ci.d/discover-k8s.yml
+  - local: discover-k8s.yml
     inputs:
-      namespace-mapping: "*default*::factory2::V.2"
-      pod-mapping: "*::factory2::V.2"
-      token: ${K8S_URL}
-      url: ${K8S_TOKEN}
+      namespace-mapping: "default::flask-monorepo-project::${SCRIBE_PRODUCT_VERSION} default::dhs-vue-sample-proj::${SCRIBE_PRODUCT_VERSION}"
+      pod-mapping: "*service-*::flask-monorepo-project::${SCRIBE_PRODUCT_VERSION} *dhs*::dhs-vue-sample-proj::${SCRIBE_PRODUCT_VERSION}"
+      token: ${K8S_TOKEN}
+      url: ${K8S_URL}
 
   # BOM
-  - local: gitlab-ci.d/bom-dockerhub.yml
+  - local: bom-dockerhub.yml
     inputs:
-      mapping: "*service-*::Flask::V.2 *dhs*::dhs-vue-sample-proj::V.2"
+      mapping: "*service-*::flask-monorepo-project::${SCRIBE_PRODUCT_VERSION} *dhs*::dhs-vue-sample-proj::${SCRIBE_PRODUCT_VERSION}"
 
-  - local: gitlab-ci.d/bom-k8s.yml
+  - local: bom-k8s.yml
     inputs:
-      mapping: "*default*::*::*::factory2::V.2"
+      mapping: "default::*service-*::*service-*::flask-monorepo-project::${SCRIBE_PRODUCT_VERSION}"
 
   # POLICY
-  - local: gitlab-ci.d/policy-gitlab.yml
+  - local: policy-gitlab.yml
     inputs:
-      project-mapping: "flask-monorepo-project::Flask::V.2 dhs-vue-sample-proj::dhs-vue-sample-proj::V.2"
-      organization-mapping: "*::Flask::V.2 *::dhs-vue-sample-proj::V.2"
+      project-mapping: "*flask-monorepo-project::flask-monorepo-project::${SCRIBE_PRODUCT_VERSION} *dhs-vue-sample-proj::dhs-vue-sample-proj::${SCRIBE_PRODUCT_VERSION}"
+      organization-mapping: "*::flask-monorepo-project::${SCRIBE_PRODUCT_VERSION} *::dhs-vue-sample-proj::${SCRIBE_PRODUCT_VERSION}"
 
-  - local: gitlab-ci.d/policy-dockerhub.yml
+  - local: policy-dockerhub.yml
     inputs:
-      mapping: "*service-*::Flask::V.2 *dhs*::dhs-vue-sample-proj::V.2"
+      image-mapping: "*service-*::flask-monorepo-project::${SCRIBE_PRODUCT_VERSION} *dhs*::dhs-vue-sample-proj::${SCRIBE_PRODUCT_VERSION}"
 
-  - local: gitlab-ci.d/policy-k8s.yml
+  - local: policy-k8s.yml
     inputs:
-      mapping: "*default*::*::*::factory2::V.2"
+      image-mapping: "default::*service-*::*service-*::flask-monorepo-project::${SCRIBE_PRODUCT_VERSION}"
 
 discovery-gitlab:
   stage: discovery

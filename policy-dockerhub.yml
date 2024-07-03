@@ -1,6 +1,6 @@
 spec:
     inputs:
-      mapping:
+      image-mapping:
         type: string
         description: "Image to product mapping"
         default: ""
@@ -69,15 +69,15 @@ policy-dockerhub:
       - |
         if $[[ inputs.sign ]]; then
           platforms verify \
-            --valint.git-branch discovery \
             --valint.sign \
+            --allow-failures \
             dockerhub \
             --image.mapping \
-            $[[ inputs.mapping ]]
+            $[[ inputs.image-mapping ]]
         else
           platforms verify \
-            --valint.git-branch discovery \
+            --allow-failures \
             dockerhub \
             --image.mapping \
-            $[[ inputs.mapping ]]
+            $[[ inputs.image-mapping ]]
         fi
