@@ -78,7 +78,7 @@ policy-dockerhub:
             dockerhub \
             --image.mapping \
             $[[ inputs.image-mapping ]] \
-            --namespace.mapping \
+            --scope.namespace \
             $[[ inputs.scope-namespace ]]
         else
           platforms verify \
@@ -86,6 +86,6 @@ policy-dockerhub:
             dockerhub \
             --image.mapping \
             $[[ inputs.image-mapping ]] \
-            --namespace.mapping \
+            --scope.namespace \
             $[[ inputs.scope-namespace ]]
         fi
