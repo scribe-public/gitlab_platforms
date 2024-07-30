@@ -15,7 +15,7 @@ spec:
     scope-namespace:
       type: string
       description: "Select Dockerhub namespace"
-      default: "*"
+      default: "\"*\""
     password-b64:
       type: string
       description: "Base64 Dockerhub token"
@@ -83,11 +83,11 @@ discovery-dockerhub:
     - export DOCKERHUB_PASSWORD=$(echo $[[ inputs.password-b64 ]] | base64 -d | tr -d '\r' )
   script:      
     - |
-      'platforms discover dockerhub \
+      platforms discover dockerhub \
         --username $[[ inputs.username ]] \
         --password $DOCKERHUB_PASSWORD \
         --scope.past_days $[[ inputs.scope-days ]] \
-        --scope.namespace $[[ inputs.scope-namespace ]]'
+        --scope.namespace $[[ inputs.scope-namespace ]]
     - |
       if $[[ inputs.sign ]]; then
         platforms evidence \

@@ -7,7 +7,7 @@ spec:
       scope-namespace:
          type: string
          description: "Select Dockerhub namespace"
-         default: "*"
+         default: "\"*\""
       sign:
         type: boolean
         description: "Sign the BOM"
