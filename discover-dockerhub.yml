@@ -12,6 +12,10 @@ spec:
       type: string
       description: "Image repository to product mapping"
       default: ""
+    scope-namespace:
+      type: string
+      description: "Select Dockerhub namespace"
+      default: "\"*\""
     password-b64:
       type: string
       description: "Base64 Dockerhub token"
@@ -82,8 +86,8 @@ discovery-dockerhub:
       platforms discover dockerhub \
         --username $[[ inputs.username ]] \
         --password $DOCKERHUB_PASSWORD \
-        --scope.past_days $[[ inputs.scope-days ]]
-
+        --scope.past_days $[[ inputs.scope-days ]] \
+        --scope.namespace $[[ inputs.scope-namespace ]]
     - |
       if $[[ inputs.sign ]]; then
         platforms evidence \
