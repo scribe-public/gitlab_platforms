@@ -87,7 +87,7 @@ discovery-dockerhub:
         --username $[[ inputs.username ]] \
         --password $DOCKERHUB_PASSWORD \
         --scope.past_days $[[ inputs.scope-days ]] \
-        --scope.namespace $[[ inputs.scope-namespace ]] \
+        --scope.namespace $[[ inputs.scope-namespace ]]
     - |
       if $[[ inputs.sign ]]; then
         platforms evidence \
@@ -96,14 +96,12 @@ discovery-dockerhub:
           --namespace.mapping \
             $[[ inputs.namespace-mapping ]] \
           --repository.mapping \
-            $[[ inputs.repository-mapping ]] \
-          --scope.namespace $[[ inputs.scope-namespace ]]
+            $[[ inputs.repository-mapping ]]
       else
         platforms evidence \
           dockerhub \
           --namespace.mapping \
             $[[ inputs.namespace-mapping ]] \
           --repository.mapping \
-            $[[ inputs.repository-mapping ]] \
-          --scope.namespace $[[ inputs.scope-namespace ]]
+            $[[ inputs.repository-mapping ]]
       fi
