@@ -4,6 +4,10 @@ spec:
         type: string
         description: "Image to product mapping"
         default: ""
+      scope-namespace:
+         type: string
+         description: "Select Dockerhub namespace"
+         default: "*"
       sign:
         type: boolean
         description: "Sign the BOM"
@@ -73,11 +77,15 @@ bom-dockerhub:
             --allow-failures \
             dockerhub \
             --image.mapping \
-            $[[ inputs.mapping ]]
+            $[[ inputs.mapping ]] \
+            --scope.namespace \
+            $[[ inputs.scope-namespace ]]
         else
           platforms bom \
             --allow-failures \
             dockerhub \
             --image.mapping \
-            $[[ inputs.mapping ]]
+            $[[ inputs.mapping ]] \
+            --scope.namespace \
+            $[[ inputs.scope-namespace ]]
         fi
