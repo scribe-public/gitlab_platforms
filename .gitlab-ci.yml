@@ -209,6 +209,7 @@ policy-dockerhub:
   variables:
     PLATFORMS_DB_PATH: dockerhub.platforms.db
     VALINT_OUTPUT_DIRECTORY: evidence/dockerhub
+    VALINT_SCRIBE_RETRY_TIMEOUT: 7600s
   artifacts:
     paths:
       - evidence/dockerhub/*sarif*
@@ -227,6 +228,7 @@ policy-k8s:
   variables:
     PLATFORMS_DB_PATH: k8s.platforms.db
     VALINT_OUTPUT_DIRECTORY: evidence/k8s
+    VALINT_SCRIBE_RETRY_TIMEOUT: 7600s
   artifacts:
     paths:
       - evidence/k8s/*sarif*
